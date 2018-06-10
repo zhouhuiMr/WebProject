@@ -23,7 +23,7 @@ window.onload = function(){
     camera.position.set(0,5,5);
 
     //设置渲染方式
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({alpha: true, antialias: true } );
     renderer.setSize( sceneWidth, sceneHeight );
     if(isUseShadow){
         renderer.shadowMap.enabled = true;
@@ -33,18 +33,19 @@ window.onload = function(){
     document.getElementById("container").appendChild(renderer.domElement);
 
     //添加光照
-    var hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0x000000, .9);
+    var hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, .9);
     scene.add( hemisphereLight );
 
-    var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.9 );
-    directionalLight.position.set( 0, 5, 0 );
+    var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 ,100);
+    directionalLight.position.set(2, 5, 0 );
+    directionalLight.target.position.set( 0, 0, 0 );
     directionalLight.castShadow = true;
     scene.add( directionalLight );
 
-    directionalLight.shadow.mapSize.width = 1024;  // default
-    directionalLight.shadow.mapSize.height = 1024; // default
-    directionalLight.shadow.camera.near = 0.1;    // default
-    directionalLight.shadow.camera.far = 10;     // default
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.camera.near = -100;
+    directionalLight.shadow.camera.far = 500;
 
     //添加辅助工具
     let tool = new helpersTools();
@@ -57,7 +58,7 @@ window.onload = function(){
 
     var floorGeometry = new THREE.PlaneGeometry(100,100,50,50);
     var material = new THREE.MeshLambertMaterial({
-        color : 0xc27c66,
+        color : 0x628cb7,
         side : THREE.DoubleSide,
         wireframe : false
     });
@@ -69,7 +70,7 @@ window.onload = function(){
 
 
     var myPlane = new plane();
-    myPlane.body.position.set(0,1,0);
+    myPlane.body.position.set(0,3,0);
     myPlane.build(scene);
 
 
