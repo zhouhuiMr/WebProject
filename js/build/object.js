@@ -188,7 +188,12 @@
             hindTire3.position.set(-hindHeight + 0.15,-0.6,0);
             this.body.add(hindTire3);
 
-            //
+            //挡风玻璃
+            let frontGlassGeometry = new THREE.BoxGeometry(0.05, 0.7, 1.2);
+            let frontGlass = new THREE.Mesh(frontGlassGeometry,this.glassMaterial);
+            frontGlass.position.set( -1, frontHeight / 2 - 0.1, 0 );
+            this.body.add(frontGlass);
+
 
             // this.body.scale.set(0.3,0.3,0.3);
         },
@@ -200,4 +205,9 @@
         }
     };
     window.plane = plane;
+
+    var flyer = function(){
+
+    }
+    window.flyer = flyer;
 })(window);
