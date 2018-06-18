@@ -4,7 +4,7 @@
  * @description 主要的应用对象
  * */
 (function(window){
-    var plane = function(){
+    let plane = function(){
         this.body = new THREE.Group();
 
         this.Front = null;
@@ -20,6 +20,8 @@
         this.sopilerGeometry = null;
         this.wingGeometry = null;
         this.hindWingGeometry = null;
+
+        this.flyer = null;
 
         this.frontMaterial = new THREE.MeshPhongMaterial({
             color : 0xd8d0d1,
@@ -54,7 +56,7 @@
             wireframe : false
         });
 
-        this.airScrewRotation = 0;// 螺旋桨转过的角度
+        //this.airScrewRotation = 0;// 螺旋桨转过的角度
         this.init();
     };
     plane.prototype = {
@@ -121,26 +123,26 @@
 
             let Wing_1 = new THREE.Mesh(this.wingGeometry,this.hindMaterial);
             Wing_1.castShadow = true;
-            Wing_1.rotation.y = -1 * Math.PI / 10;
+            //Wing_1.rotation.y = -1 * Math.PI / 10;
             Wing_1.position.set(-wingWidth / 2 - 0.5,- wingHeight / 2 + 0.5 , wingDepth / 2);
             this.Wing.add(Wing_1);
 
             let Wing_2 = new THREE.Mesh(this.wingGeometry,this.hindMaterial);
             Wing_2.castShadow = true;
-            Wing_2.rotation.y =  Math.PI / 10;
+            //Wing_2.rotation.y =  Math.PI / 10;
             Wing_2.position.set(-wingWidth / 2 - 0.5,- wingHeight / 2 + 0.5 ,-1 * wingDepth / 2);
             this.Wing.add(Wing_2);
 
             let hindWing_1 = new THREE.Mesh(this.hindWingGeometry,this.hindMaterial);
             hindWing_1.castShadow = true;
-            hindWing_1.rotation.y =  -1 * Math.PI / 10;
-            hindWing_1.position.set(-hindHeight+wingWidth / 2 - 0.6,0.2, hindWingDepth / 2);
+            //hindWing_1.rotation.y =  -1 * Math.PI / 10;
+            hindWing_1.position.set(-hindHeight+wingWidth / 2 - 0.6,0.5, hindWingDepth / 2);
             this.Wing.add(hindWing_1);
 
             let hindWing_2 = new THREE.Mesh(this.hindWingGeometry,this.hindMaterial);
             hindWing_2.castShadow = true;
-            hindWing_2.rotation.y =  Math.PI / 10;
-            hindWing_2.position.set(-hindHeight+wingWidth / 2 - 0.6,0.2,-1 * hindWingDepth / 2);
+            //hindWing_2.rotation.y =  Math.PI / 10;
+            hindWing_2.position.set(-hindHeight+wingWidth / 2 - 0.6,0.5,-1 * hindWingDepth / 2);
             this.Wing.add(hindWing_2);
 
             this.body.add(this.Wing);
@@ -156,7 +158,11 @@
             let airScrew_1 =  new THREE.Mesh(airScrewGeometry_1,this.airScrewMaterial);
             airScrew_1.castShadow = true;
             this.airScrew.add(airScrew_1);
-            this.airScrew.translateX(frontWidth + 0.1);
+            let airScrew_2 =  new THREE.Mesh(airScrewGeometry_1,this.airScrewMaterial);
+            airScrew_2.rotation.x = Math.PI / 2;
+            airScrew_2.castShadow = true;
+            this.airScrew.add(airScrew_2);
+            this.airScrew.translateX(frontWidth + 0.15);
             this.body.add(this.airScrew);
 
             //飞机起落架
@@ -194,6 +200,10 @@
             frontGlass.position.set( -1, frontHeight / 2 - 0.1, 0 );
             this.body.add(frontGlass);
 
+            //添加飞行员
+            this.flyer = new flyer();
+            this.flyer.body.position.set(-1.8,1.2,0);
+            this.body.add(this.flyer.build());
 
             // this.body.scale.set(0.3,0.3,0.3);
         },
@@ -206,8 +216,166 @@
     };
     window.plane = plane;
 
-    var flyer = function(){
+    let flyer = function(){
+        this.body = new THREE.Group();
+        this.head = null;//头
+        this.eyes = new THREE.Group();//眼睛
+        this.nose = null;// 鼻子
+        this.mouth = null;//嘴
+        this.hear = new THREE.Group();
+        this.hairArray = new Array();
+        this.init();
+    };
+    flyer.prototype = {
+        init : function(){
+            //人物头部
+            let headGeometry = new THREE.BoxGeometry(1,1,1,1,1,1);
+            let headMaterial = new THREE.MeshLambertMaterial({
+                color : 0xd1b685,
+                side : THREE.FrontSide,
+                flatShading:true,
+                wireframe : false
+            });
+            this.head = new THREE.Mesh(headGeometry,headMaterial);
+            this.body.add(this.head);
+            //眼睛
+            let eyeGeometry = new THREE.BoxGeometry(0.01,0.1,0.2);
+            let eyeMaterial = new THREE.MeshLambertMaterial({
+                color : 0x000000,
+                side : THREE.FrontSide,
+                flatShading:true,
+                wireframe : false
+            });
+            let righteye = new THREE.Mesh(eyeGeometry,eyeMaterial);
+            righteye.position.set(0.5,0.2,0.23);
+            righteye.rotateX(Math.PI / 8);
+            this.eyes.add(righteye);
+            let lefteye = righteye.clone();
+            lefteye.position.set(0.5,0.2,-0.23);
+            lefteye.rotateX(-Math.PI / 4);
+            this.eyes.add(lefteye);
+            this.body.add(this.eyes);
+            //鼻子
+            let noseGeometry = new THREE.BoxGeometry(0.2,0.2,0.08);
+            this.nose = new THREE.Mesh(noseGeometry,headMaterial);
+            this.nose.position.set(0.45,-0.1,0);
+            this.nose.rotateZ(Math.PI / 10);
+            this.body.add(this.nose);
+            //嘴
+            let mouthGeometry = new THREE.BoxGeometry(0.1,0.05,0.3);
+            let mouthMaterial = new THREE.MeshLambertMaterial({
+                color : 0x840906,
+                side : THREE.FrontSide,
+                flatShading:true,
+                wireframe : false
+            });
+            this.mouth = new THREE.Mesh(mouthGeometry,mouthMaterial);
+            this.mouth.position.set(0.5,-0.4,0);
+            this.body.add(this.mouth);
+            //头发
+            let hairMaterial = new THREE.MeshLambertMaterial({
+                color : 0x613600,
+                side : THREE.FrontSide,
+                flatShading:true,
+                wireframe : false
+            });
+            let hairGeometry_1 = new THREE.BoxGeometry(1,0.06,1.04);
+            let hair_1 = new THREE.Mesh(hairGeometry_1,hairMaterial);
+            hair_1.position.set(0,0.53,0);
+            this.hear.add(hair_1);
+            let hairGeometry_2 = new THREE.BoxGeometry(0.72,0.7,1.04);
+            let hair_2 = new THREE.Mesh(hairGeometry_2,hairMaterial);
+            hair_2.position.set(-0.2,0.21,0);
+            this.hear.add(hair_2);
+            this.body.add(this.hear);
+            const size = 1.04 / 3;
+            for(var i = 0;i < 4;i ++){
+                for(var j = 0;j < 3 ;j ++){
+                    let hairGeometry = new THREE.BoxGeometry(size,0.5,size);
+                    let hair = new THREE.Mesh(hairGeometry,hairMaterial);
+                    let h = Math.random() * 0.3;
+                    hair.position.set(-size * 2 + size * i - 0.1,h + 0.4,-size + size * j);
+                    this.hairArray.push(hair);
+                    this.hear.add(hair);
+                }
+            }
+            let partGeometry = new THREE.BoxGeometry(1.4,1,1.4);
+            let partMaterial = new THREE.MeshLambertMaterial({
+                color : 0x64490c,
+                side : THREE.FrontSide,
+                flatShading:true,
+                wireframe : false
+            });
+            let part = new THREE.Mesh(partGeometry,partMaterial);
+            part.position.set( -0.1, -0.97, 0);
+            this.body.add(part);
 
-    }
-    window.flyer = flyer;
+            this.body.scale.set( 0.6, 0.6, 0.6);
+        },
+        build : function(){
+            return this.body;
+        },
+        hairAnimate : function(){
+            for(var i=0;i<this.hairArray.length;i++){
+                let hair = this.hairArray[i];
+                let h = Math.random() * 0.3;
+                hair.position.y = h + 0.4;
+            }
+        }
+
+    };
+
+    let pine = function(){
+        this.body = new THREE.Group();
+        this.pineMaterial = new THREE.MeshLambertMaterial({
+            color : 0x084106,
+            side : THREE.FrontSide,
+            flatShading:true,
+            wireframe : false
+        });
+        this.init();
+    };
+    pine.prototype = {
+        init : function(){
+            let topSize = 0;
+            let bottomSize = 1;
+            let pineHeight = 2;
+            let siteY = 0;
+            for(var i = 0;i < 3;i ++){
+                let pineGeometry = new THREE.CylinderGeometry(
+                    topSize,bottomSize,pineHeight,4,
+                    1,false,0,6.3
+                );
+                let p = new THREE.Mesh(pineGeometry,this.pineMaterial);
+                p.position.set(0,siteY,0);
+                p.castShadow = true;
+                p.receiveShadow = true;
+                this.body.add(p);
+                topSize = bottomSize - 0.4;
+                bottomSize = bottomSize + 1;
+                siteY = siteY -pineHeight + 0.3;
+            }
+            let trunkGeometry = new THREE.CylinderGeometry(
+                0.5,0.5,1,8,
+                1,false,0,6.3
+            );
+            let trunkMaterial = new THREE.MeshLambertMaterial({
+                color : 0x402308,
+                side : THREE.FrontSide,
+                flatShading:true,
+                wireframe : false
+            });
+            let trunk = new THREE.Mesh(trunkGeometry,trunkMaterial);
+            trunk.position.set(0,siteY + 0.5,0);
+            trunk.castShadow = true;
+            trunk.receiveShadow = true;
+            this.body.add(trunk);
+
+            this.body.scale.set(2,2,2);
+        },
+        build : function(scene){
+            scene.add(this.body);
+        }
+    };
+    window.pine = pine;
 })(window);

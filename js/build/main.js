@@ -16,7 +16,8 @@ window.onload = function(){
 
     //设置场景
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xffffff);
+    scene.background = new THREE.Color(0xf1dcac);
+    scene.fog = new THREE.Fog(0xf2db6e,20,40);
 
     //设置摄像机
     camera = new THREE.PerspectiveCamera( 75, sceneWidth/sceneHeight, 1, 1000 );
@@ -33,24 +34,19 @@ window.onload = function(){
     document.getElementById("container").appendChild(renderer.domElement);
 
     //添加光照
-    var hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, .9);
-    scene.add( hemisphereLight );
+    var light = new sceneLight(scene,camera);
+    light.build();
 
-    var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 ,100);
-    directionalLight.position.set(2, 5, 0 );
-    directionalLight.target.position.set( 0, 0, 0 );
-    directionalLight.castShadow = true;
-    scene.add( directionalLight );
-
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
-    directionalLight.shadow.camera.near = -100;
-    directionalLight.shadow.camera.far = 500;
-
-    //添加辅助工具
-    let tool = new helpersTools();
-    tool.gridHelperBuild(scene);
-    tool.axesHelperBuild(scene);
+    //var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 ,100);
+    //directionalLight.position.set(2, 5, 0 );
+    //directionalLight.target.position.set( 0, 0, 0 );
+    //directionalLight.castShadow = true;
+    //scene.add( directionalLight );
+    //
+    //directionalLight.shadow.mapSize.width = 2048;
+    //directionalLight.shadow.mapSize.height = 2048;
+    //directionalLight.shadow.camera.near = -100;
+    //directionalLight.shadow.camera.far = 500;
 
     //视角控制器
     var controls = new cameraControls(camera,renderer.domElement);
@@ -64,14 +60,27 @@ window.onload = function(){
     });
     var floor = new THREE.Mesh(floorGeometry,material);
     floor.rotation.x = Math.PI / 2;
-    floor.position.set(0,1,0);
+    floor.position.set(0,-0.1,0);
     floor.receiveShadow = true;
     scene.add(floor);
 
 
     var myPlane = new plane();
-    myPlane.body.position.set(0,3,0);
+    myPlane.body.position.set(0,10,0);
     myPlane.build(scene);
+
+    var p = new pine();
+    p.body.position.set(10,20,0);
+    p.build(scene);
+
+
+    //添加辅助工具
+    let tool = new helpersTools();
+    tool.gridHelperBuild(scene);
+    tool.axesHelperBuild(scene);
+
+    //tool.directionalLightHelperBuild(scene,light.directionalLight);
+    tool.cameraHelperBuild(scene,light.directionalLight.shadow.camera);
 
 
     let animate = function(){
@@ -80,6 +89,7 @@ window.onload = function(){
         controls.build();
 
         myPlane.fly();
+        myPlane.flyer.hairAnimate();
 
         renderer.render(scene,camera);
     };
@@ -90,6 +100,8 @@ window.onload = function(){
     let helpersTools = function(){
         this.gridHelper = null;
         this.axesHelper = null;
+        this.cameraHelper = null;
+        this.directionalLightHelper = null;
 
         this.SIZE = 100;
         this.init();
@@ -106,6 +118,14 @@ window.onload = function(){
         },
         axesHelperBuild : function(scene){
             scene.add(this.axesHelper);
+        },
+        cameraHelperBuild : function(scene,camera){
+            this.cameraHelper = new THREE.CameraHelper(camera);
+            scene.add(this.cameraHelper);
+        },
+        directionalLightHelperBuild : function(scene,light){
+            this.directionalLightHelper = new THREE.DirectionalLightHelper( light, 5 , 0x000000 );
+            scene.add(this.directionalLightHelper);
         }
     };
     obj.helpersTools = helpersTools;
@@ -146,6 +166,39 @@ window.onload = function(){
         }
     };
     obj.cameraControls = cameraControls;
+
+    let sceneLight = function(scene,camera){
+        this.scene = scene;
+        this.camera = camera;
+        this.hemisphereLight = null;
+        this.directionalLight = null;
+        this.init();
+    };
+    sceneLight.prototype = {
+        init : function(){
+            this.hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, 0.9);
+
+            this.directionalLight = new THREE.DirectionalLight( 0xffffff, 1);
+            this.directionalLight.position.set(15, 30, 0 );
+            this.directionalLight.target.position.set( 0, 0, 0 );
+            this.directionalLight.castShadow = true;
+
+            this.directionalLight.shadow.camera.left = -60;
+            this.directionalLight.shadow.camera.bottom = -60;
+            this.directionalLight.shadow.camera.right = 60;
+            this.directionalLight.shadow.camera.top = 60;
+            this.directionalLight.shadow.camera.near = 0.1;
+            this.directionalLight.shadow.camera.far = 60;
+            this.directionalLight.shadow.mapSize.width = 2048;  // default
+            this.directionalLight.shadow.mapSize.height = 2048; // default
+
+        },
+        build : function(){
+            this.scene.add(this.hemisphereLight);
+            this.scene.add(this.directionalLight);
+        }
+    };
+    obj.sceneLight = sceneLight;
 })(window);
 
 
