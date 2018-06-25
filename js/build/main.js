@@ -17,11 +17,11 @@ window.onload = function(){
     //设置场景
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf1dcac);
-    scene.fog = new THREE.Fog(0xf2db6e,20,40);
+    // scene.fog = new THREE.Fog(0xf2db6e,20,40);
 
     //设置摄像机
     camera = new THREE.PerspectiveCamera( 75, sceneWidth/sceneHeight, 1, 1000 );
-    camera.position.set(0,5,5);
+    camera.position.set(0,30,50);
 
     //设置渲染方式
     renderer = new THREE.WebGLRenderer({alpha: true, antialias: true } );
@@ -33,20 +33,13 @@ window.onload = function(){
 
     document.getElementById("container").appendChild(renderer.domElement);
 
+    //帧数显示
+    let stats = new Stats();
+    document.getElementById("container").appendChild(stats.dom);
+
     //添加光照
     var light = new sceneLight(scene,camera);
     light.build();
-
-    //var directionalLight = new THREE.DirectionalLight( 0xffffff, 1 ,100);
-    //directionalLight.position.set(2, 5, 0 );
-    //directionalLight.target.position.set( 0, 0, 0 );
-    //directionalLight.castShadow = true;
-    //scene.add( directionalLight );
-    //
-    //directionalLight.shadow.mapSize.width = 2048;
-    //directionalLight.shadow.mapSize.height = 2048;
-    //directionalLight.shadow.camera.near = -100;
-    //directionalLight.shadow.camera.far = 500;
 
     //视角控制器
     var controls = new cameraControls(camera,renderer.domElement);
@@ -71,6 +64,7 @@ window.onload = function(){
 
     var p = new pine();
     p.body.position.set(10,20,0);
+    p.body.rotation.z = -Math.PI / 4;
     p.build(scene);
 
 
@@ -82,6 +76,16 @@ window.onload = function(){
     //tool.directionalLightHelperBuild(scene,light.directionalLight);
     tool.cameraHelperBuild(scene,light.directionalLight.shadow.camera);
 
+    var geometry = new THREE.CylinderBufferGeometry( 5, 5, 5, 3 );
+    console.info(geometry.attributes.position.array);
+    var a = geometry.attributes.position.array;
+    for(var i=0;i<a.length;i++){
+        a[i] = a[i]+(-5+Math.random()*5);
+    }
+    var material = new THREE.MeshBasicMaterial( {color: 0xdddddd,wireframe : true} );
+    var cylinder = new THREE.Mesh( geometry, material );
+    scene.add( cylinder );
+
 
     let animate = function(){
         window.requestAnimationFrame(animate);
@@ -90,6 +94,8 @@ window.onload = function(){
 
         myPlane.fly();
         myPlane.flyer.hairAnimate();
+
+        stats.update();
 
         renderer.render(scene,camera);
     };
