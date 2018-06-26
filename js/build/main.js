@@ -20,7 +20,7 @@ window.onload = function(){
     // scene.fog = new THREE.Fog(0xf2db6e,20,40);
 
     //设置摄像机
-    camera = new THREE.PerspectiveCamera( 75, sceneWidth/sceneHeight, 1, 1000 );
+    camera = new THREE.PerspectiveCamera( 75, sceneWidth/sceneHeight, 1, 300 );
     camera.position.set(0,30,50);
 
     //设置渲染方式
@@ -45,27 +45,31 @@ window.onload = function(){
     var controls = new cameraControls(camera,renderer.domElement);
     controls.build();
 
-    var floorGeometry = new THREE.PlaneGeometry(100,100,50,50);
-    var material = new THREE.MeshLambertMaterial({
-        color : 0x628cb7,
-        side : THREE.DoubleSide,
-        wireframe : false
-    });
-    var floor = new THREE.Mesh(floorGeometry,material);
-    floor.rotation.x = Math.PI / 2;
-    floor.position.set(0,-0.1,0);
-    floor.receiveShadow = true;
-    scene.add(floor);
+    // var floorGeometry = new THREE.PlaneGeometry(100,100,50,50);
+    // var material = new THREE.MeshLambertMaterial({
+    //     color : 0x628cb7,
+    //     side : THREE.DoubleSide,
+    //     wireframe : false
+    // });
+    // var floor = new THREE.Mesh(floorGeometry,material);
+    // floor.rotation.x = Math.PI / 2;
+    // floor.position.set(0,-0.1,0);
+    // floor.receiveShadow = true;
+    // scene.add(floor);
+
+    var myGround = new ground();
+    myGround.body.position.set(0,-50,0);
+    myGround.build(scene);
 
 
     var myPlane = new plane();
-    myPlane.body.position.set(0,10,0);
+    myPlane.body.position.set(0,20,0);
     myPlane.build(scene);
 
-    var p = new pine();
-    p.body.position.set(10,20,0);
-    p.body.rotation.z = -Math.PI / 4;
-    p.build(scene);
+    // var p = new pine();
+    // p.body.position.set(10,20,0);
+    // p.body.rotation.z = -Math.PI / 4;
+    // p.build(scene);
 
 
     //添加辅助工具
@@ -76,16 +80,6 @@ window.onload = function(){
     //tool.directionalLightHelperBuild(scene,light.directionalLight);
     tool.cameraHelperBuild(scene,light.directionalLight.shadow.camera);
 
-    var geometry = new THREE.CylinderBufferGeometry( 5, 5, 5, 3 );
-    console.info(geometry.attributes.position.array);
-    var a = geometry.attributes.position.array;
-    for(var i=0;i<a.length;i++){
-        a[i] = a[i]+(-5+Math.random()*5);
-    }
-    var material = new THREE.MeshBasicMaterial( {color: 0xdddddd,wireframe : true} );
-    var cylinder = new THREE.Mesh( geometry, material );
-    scene.add( cylinder );
-
 
     let animate = function(){
         window.requestAnimationFrame(animate);
@@ -94,6 +88,7 @@ window.onload = function(){
 
         myPlane.fly();
         myPlane.flyer.hairAnimate();
+        myGround.move();
 
         stats.update();
 

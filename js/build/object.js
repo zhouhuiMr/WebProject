@@ -4,6 +4,9 @@
  * @description 主要的应用对象
  * */
 (function(window){
+    /**------------------------**/
+    /**  飞机                  **/
+    /**------------------------**/
     let plane = function(){
         this.body = new THREE.Group();
 
@@ -216,6 +219,9 @@
     };
     window.plane = plane;
 
+    /**------------------------**/
+    /** 飞行员                 **/
+    /**------------------------**/
     let flyer = function(){
         this.body = new THREE.Group();
         this.head = null;//头
@@ -325,6 +331,88 @@
 
     };
 
+    /**------------------------**/
+    /** 陆地                   **/
+    /**------------------------**/
+    let ground = function(){
+        this.body = new THREE.Group();
+        this.radius = 60;
+        this.height = 100;
+        this.radialSegments = 20;
+        this.heightSegments = 50;
+        this.landGeometry = null;
+        this.land = null;
+        this.oceanGeometry = null;
+        this.ocean = null;
+        this.vertices = new Array();
+        this.landMaterial = new THREE.MeshLambertMaterial({
+            color : 0x206510,
+            side : THREE.FrontSide,
+            flatShading:true,
+            wireframe : false
+        });
+        this.oceanMaterial = new THREE.MeshPhongMaterial({
+            color: 0x29888e,
+            transparent: true,
+            opacity : 0.8,
+            flatShading:true,
+            wireframe : false,
+        });
+        this.init();
+    };
+    ground.prototype = {
+        init : function(){
+            this.landGeometry = new THREE.CylinderGeometry(
+                this.radius - 0.01, this.radius - 0.01, this.height ,
+                this.radialSegments , this.heightSegments ,
+                false , Math.PI / 2 , Math.PI+0.01
+            );
+            this.land = new THREE.Mesh(this.landGeometry,this.landMaterial);
+            this.land.rotation.x = Math.PI / 2;
+            this.land.receiveShadow = true;
+            this.body.add(this.land);
+
+            this.oceanGeometry = new THREE.CylinderGeometry(
+                this.radius , this.radius , this.height ,
+                this.radialSegments , this.heightSegments ,
+                false , -Math.PI / 2 , Math.PI+0.01
+            );
+            for(var i = 0;i<this.oceanGeometry.vertices.length;i++){
+                var v = {
+                    x : this.oceanGeometry.vertices[i].x,
+                    y : this.oceanGeometry.vertices[i].y,
+                    z : this.oceanGeometry.vertices[i].z,
+                };
+                this.vertices.push(v);
+            }
+            this.ocean = new THREE.Mesh(this.oceanGeometry,this.oceanMaterial);
+            this.ocean.rotation.x = Math.PI / 2;
+            this.ocean.receiveShadow = true;
+            this.body.add(this.ocean);
+        },
+        build : function(scene){
+            scene.add(this.body);
+        },
+        move : function(){
+            this.body.rotateZ(0.005);
+            let vert = this.oceanGeometry.vertices;
+            this.oceanGeometry.verticesNeedUpdate = true;
+
+            for(var i = 0; i < vert.length;i ++){
+                vert[i].x = this.vertices[i].x;
+                vert[i].y = this.vertices[i].y;
+                vert[i].z = this.vertices[i].z;
+                let v = vert[i];
+                v.x = v.x + (Math.random() * 4 - 2);
+                v.y = v.y + (Math.random() * 4 - 2);
+            }
+        }
+    };
+    window.ground = ground;
+
+    /**------------------------**/
+    /** 松树                   **/
+    /**------------------------**/
     let pine = function(){
         this.body = new THREE.Group();
         this.pineMaterial = new THREE.MeshLambertMaterial({
