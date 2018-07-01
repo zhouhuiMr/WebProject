@@ -74,7 +74,7 @@ window.onload = function(){
 
     //添加辅助工具
     let tool = new helpersTools();
-    tool.gridHelperBuild(scene);
+    // tool.gridHelperBuild(scene);
     tool.axesHelperBuild(scene);
 
     //tool.directionalLightHelperBuild(scene,light.directionalLight);

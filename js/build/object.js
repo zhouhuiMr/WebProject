@@ -237,7 +237,7 @@
             //人物头部
             let headGeometry = new THREE.BoxGeometry(1,1,1,1,1,1);
             let headMaterial = new THREE.MeshLambertMaterial({
-                color : 0xd1b685,
+                color : 0xdeb582,
                 side : THREE.FrontSide,
                 flatShading:true,
                 wireframe : false
@@ -270,7 +270,7 @@
             //嘴
             let mouthGeometry = new THREE.BoxGeometry(0.1,0.05,0.3);
             let mouthMaterial = new THREE.MeshLambertMaterial({
-                color : 0x840906,
+                color : 0xd17947,
                 side : THREE.FrontSide,
                 flatShading:true,
                 wireframe : false
@@ -300,7 +300,7 @@
                     let hairGeometry = new THREE.BoxGeometry(size,0.5,size);
                     let hair = new THREE.Mesh(hairGeometry,hairMaterial);
                     let h = Math.random() * 0.3;
-                    hair.position.set(-size * 2 + size * i - 0.1,h + 0.4,-size + size * j);
+                    hair.position.set(-size * 2 + size * i,h + 0.4,-size + size * j);
                     this.hairArray.push(hair);
                     this.hear.add(hair);
                 }
@@ -339,22 +339,23 @@
         this.radius = 60;
         this.height = 100;
         this.radialSegments = 20;
-        this.heightSegments = 50;
+        this.heightSegments = 40;
         this.landGeometry = null;
         this.land = null;
         this.oceanGeometry = null;
         this.ocean = null;
-        this.vertices = new Array();
+        this.waves = new Array();
         this.landMaterial = new THREE.MeshLambertMaterial({
             color : 0x206510,
-            side : THREE.FrontSide,
+            side : THREE.DoubleSide,
             flatShading:true,
             wireframe : false
         });
         this.oceanMaterial = new THREE.MeshPhongMaterial({
             color: 0x29888e,
+            side : THREE.DoubleSide,
             transparent: true,
-            opacity : 0.8,
+            opacity : 1,
             flatShading:true,
             wireframe : false,
         });
@@ -363,7 +364,7 @@
     ground.prototype = {
         init : function(){
             this.landGeometry = new THREE.CylinderGeometry(
-                this.radius - 0.01, this.radius - 0.01, this.height ,
+                this.radius + 3, this.radius + 3, this.height ,
                 this.radialSegments , this.heightSegments ,
                 false , Math.PI / 2 , Math.PI+0.01
             );
@@ -375,15 +376,18 @@
             this.oceanGeometry = new THREE.CylinderGeometry(
                 this.radius , this.radius , this.height ,
                 this.radialSegments , this.heightSegments ,
-                false , -Math.PI / 2 , Math.PI+0.01
+                false , -Math.PI / 2 -0.06, Math.PI+0.12
             );
             for(var i = 0;i<this.oceanGeometry.vertices.length;i++){
                 var v = {
                     x : this.oceanGeometry.vertices[i].x,
                     y : this.oceanGeometry.vertices[i].y,
                     z : this.oceanGeometry.vertices[i].z,
+                    ang : Math.random() * Math.PI * 2,
+                    amp : Math.random() * 3,
+                    speed : 0.016 + Math.random()*0.032
                 };
-                this.vertices.push(v);
+                this.waves.push(v);
             }
             this.ocean = new THREE.Mesh(this.oceanGeometry,this.oceanMaterial);
             this.ocean.rotation.x = Math.PI / 2;
@@ -399,12 +403,11 @@
             this.oceanGeometry.verticesNeedUpdate = true;
 
             for(var i = 0; i < vert.length;i ++){
-                vert[i].x = this.vertices[i].x;
-                vert[i].y = this.vertices[i].y;
-                vert[i].z = this.vertices[i].z;
                 let v = vert[i];
-                v.x = v.x + (Math.random() * 4 - 2);
-                v.y = v.y + (Math.random() * 4 - 2);
+                let wave = this.waves[i];
+                v.x = wave.x + Math.cos(wave.ang) * wave.amp;
+                v.y = wave.y + Math.sin(wave.ang) * wave.amp;
+                wave.ang += wave.speed;
             }
         }
     };
