@@ -208,7 +208,7 @@
             this.flyer.body.position.set(-1.8,1.2,0);
             this.body.add(this.flyer.build());
 
-            // this.body.scale.set(0.3,0.3,0.3);
+            this.body.scale.set(0.7,0.7,0.7);
         },
         build : function(scene){
             scene.add(this.body);
@@ -337,9 +337,9 @@
     let ground = function(){
         this.body = new THREE.Group();
         this.radius = 60;
-        this.height = 100;
+        this.height = 30;
         this.radialSegments = 20;
-        this.heightSegments = 40;
+        this.heightSegments = 10;
         this.landGeometry = null;
         this.land = null;
         this.oceanGeometry = null;

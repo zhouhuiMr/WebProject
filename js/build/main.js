@@ -21,7 +21,7 @@ window.onload = function(){
 
     //设置摄像机
     camera = new THREE.PerspectiveCamera( 75, sceneWidth/sceneHeight, 1, 300 );
-    camera.position.set(0,30,50);
+    camera.position.set(0,30,40);
 
     //设置渲染方式
     renderer = new THREE.WebGLRenderer({alpha: true, antialias: true } );
@@ -58,12 +58,12 @@ window.onload = function(){
     // scene.add(floor);
 
     var myGround = new ground();
-    myGround.body.position.set(0,-50,0);
+    myGround.body.position.set(0,-40,30);
     myGround.build(scene);
 
 
     var myPlane = new plane();
-    myPlane.body.position.set(0,20,0);
+    myPlane.body.position.set(0,30,30);
     myPlane.build(scene);
 
     // var p = new pine();
