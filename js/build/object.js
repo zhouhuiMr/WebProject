@@ -338,7 +338,7 @@
         this.body = new THREE.Group();
         this.radius = 60;
         this.height = 30;
-        this.radialSegments = 20;
+        this.radialSegments = 30;
         this.heightSegments = 10;
         this.landGeometry = null;
         this.land = null;
@@ -352,10 +352,10 @@
             wireframe : false
         });
         this.oceanMaterial = new THREE.MeshPhongMaterial({
-            color: 0x29888e,
-            side : THREE.DoubleSide,
+            color: 0x00868B,
+            side : THREE.FrontSide,
             transparent: true,
-            opacity : 1,
+            opacity : 0.8,
             flatShading:true,
             wireframe : false,
         });
@@ -363,20 +363,20 @@
     };
     ground.prototype = {
         init : function(){
-            this.landGeometry = new THREE.CylinderGeometry(
-                this.radius + 3, this.radius + 3, this.height ,
-                this.radialSegments , this.heightSegments ,
-                false , Math.PI / 2 , Math.PI+0.01
-            );
-            this.land = new THREE.Mesh(this.landGeometry,this.landMaterial);
-            this.land.rotation.x = Math.PI / 2;
-            this.land.receiveShadow = true;
-            this.body.add(this.land);
+            // this.landGeometry = new THREE.CylinderGeometry(
+            //     this.radius + 3, this.radius + 3, this.height ,
+            //     this.radialSegments , this.heightSegments ,
+            //     false , Math.PI / 2 , Math.PI+0.01
+            // );
+            // this.land = new THREE.Mesh(this.landGeometry,this.landMaterial);
+            // this.land.rotation.x = Math.PI / 2;
+            // this.land.receiveShadow = true;
+            // this.body.add(this.land);
 
             this.oceanGeometry = new THREE.CylinderGeometry(
                 this.radius , this.radius , this.height ,
                 this.radialSegments , this.heightSegments ,
-                false , -Math.PI / 2 -0.06, Math.PI+0.12
+                true , 0, Math.PI *2
             );
             for(var i = 0;i<this.oceanGeometry.vertices.length;i++){
                 var v = {
@@ -469,4 +469,110 @@
         }
     };
     window.pine = pine;
+
+    let cloud = function(x,y,z){
+        this.body = new THREE.Group();
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.MoveRadius = 0; //旋转的半径
+        this.angle = Math.PI / 2;
+        this.pineMaterial = new THREE.MeshLambertMaterial({
+            color : 0xFFF0F5,
+            side : THREE.FrontSide,
+            flatShading:true,
+            wireframe : false
+        });
+        this.CloudNum = Math.ceil(Math.random() * 3)+2;
+        this.SPEED = Math.random() / 10 +0.05;
+        this.init();
+    };
+    cloud.prototype = {
+        init : function(){
+            let preRadius = 0;
+            for(let i = 0;i < this.CloudNum;i ++){
+                let radius = Math.random() * 3;
+                let cloudGeometry = new THREE.DodecahedronGeometry(radius,0);
+                cloudGeometry.translate(preRadius / 2 + radius / 2 * i,Math.random() * 2 , Math.random());
+                // cloudGeometry.rotateX(Math.random() * Math.PI);
+                cloudGeometry.rotateY(Math.random() * Math.PI);
+                let c = new THREE.Mesh(cloudGeometry,this.pineMaterial);
+                c.castShadow = true;
+                this.body.add(c);
+                preRadius = radius;
+            }
+            // this.x = 0;
+            // this.y = Math.random() *10 + 25;
+            // this.z = Math.random() * 25;
+            this.body.position.set(this.x,this.y,this.z);
+
+        },
+        build : function(scene){
+            scene.add(this.body);
+        },
+        move : function(){
+            if(this.x >= 80){
+                this.x = Math.random() * 30 * (-1) - 80;
+                this.y = Math.random() *10 + 25;
+                this.z = Math.random() * 10 + 20;
+                this.body.position.set(this.x,this.y,this.z);
+            }else{
+                this.x += this.SPEED;
+                this.body.position.set(this.x,this.y,this.z);
+            }
+
+        }
+    };
+    window.cloud = cloud;
+
+    var clouds = function(){
+        this.body  = new Array();
+        this.cloudNum = 8;
+        this.init();
+    };
+    clouds.prototype = {
+        init : function(){
+            //创建的多个云彩
+            for(let i = 0;i < this.cloudNum; i++){
+                let x = Math.random() * 100 - 50;
+                let y = Math.random() *20 + 25;
+                let z = Math.random() * 10 + 20;
+                let c = new cloud(x,y,z);
+                this.body.push(c);
+            }
+        },
+        build : function(scene){
+            for(let i=0;i<this.body.length;i++){
+                this.body[i].build(scene);
+            }
+        },
+        move : function(){
+            for(let i=0;i<this.body.length;i++){
+                this.body[i].move();
+            }
+        }
+    };
+    window.clouds = clouds;
+
+    var sun = function(){
+        this.body = new THREE.Group();
+        this.sunMaterial = new THREE.MeshBasicMaterial({
+            color : 0xF4A460,
+            side : THREE.FrontSide,
+            flatShading:true,
+            wireframe : false
+        });
+        this.init();
+    };
+    sun.prototype = {
+        init : function(){
+            let sunGeometry = new THREE.CircleGeometry(50,40);
+            let sun = new THREE.Mesh(sunGeometry,this.sunMaterial);
+            this.body.add(sun);
+        },
+        build : function(scene){
+            scene.add(this.body);
+        }
+    };
+    window.sun = sun;
 })(window);

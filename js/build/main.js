@@ -9,19 +9,28 @@ window.onload = function(){
     let scene = null;
     let camera = null;
     let renderer = null;
-    let isUseShadow = true;
+    let isUseShadow = true;//是否开启阴影
+    let isUseTool = false; //是否显示辅助工具
+    let isShowFPS = false;//是否显示帧数
+    let isUseController = false;//是否使用视角控制
     // 获取高度和宽度
     let sceneWidth = document.documentElement.clientWidth;
     let sceneHeight = document.documentElement.clientHeight;
 
+    //鼠标的坐标状态
+    let mousePreX = 0;
+    let mousePreY = 0;
+    let mouseCurX = 0;
+    let mouseCurY = 0;
+
     //设置场景
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf1dcac);
-    // scene.fog = new THREE.Fog(0xf2db6e,20,40);
+    scene.background = new THREE.Color(0xFFEC8B);
+    scene.fog = new THREE.Fog(0xFFF68F,5,40);
 
     //设置摄像机
     camera = new THREE.PerspectiveCamera( 75, sceneWidth/sceneHeight, 1, 300 );
-    camera.position.set(0,30,40);
+    camera.position.set(8,30,45);
 
     //设置渲染方式
     renderer = new THREE.WebGLRenderer({alpha: true, antialias: true } );
@@ -34,16 +43,24 @@ window.onload = function(){
     document.getElementById("container").appendChild(renderer.domElement);
 
     //帧数显示
-    let stats = new Stats();
-    document.getElementById("container").appendChild(stats.dom);
+    let stats = null;
+    if(isShowFPS){
+        stats = new Stats();
+        document.getElementById("container").appendChild(stats.dom);
+    }
+
 
     //添加光照
-    var light = new sceneLight(scene,camera);
+    let light = new sceneLight(scene,camera);
     light.build();
 
     //视角控制器
-    var controls = new cameraControls(camera,renderer.domElement);
-    controls.build();
+    let controls = null;
+    if(isUseController){
+        controls = new cameraControls(camera,renderer.domElement);
+        controls.build();
+    }
+
 
     // var floorGeometry = new THREE.PlaneGeometry(100,100,50,50);
     // var material = new THREE.MeshLambertMaterial({
@@ -57,13 +74,17 @@ window.onload = function(){
     // floor.receiveShadow = true;
     // scene.add(floor);
 
-    var myGround = new ground();
+    let mysun = new sun();
+    mysun.body.position.set(30,10,-20);
+    mysun.build(scene);
+
+    let myGround = new ground();
     myGround.body.position.set(0,-40,30);
     myGround.build(scene);
 
 
-    var myPlane = new plane();
-    myPlane.body.position.set(0,30,30);
+    let myPlane = new plane();
+    myPlane.body.position.set(5,32,29);
     myPlane.build(scene);
 
     // var p = new pine();
@@ -71,26 +92,57 @@ window.onload = function(){
     // p.body.rotation.z = -Math.PI / 4;
     // p.build(scene);
 
+    let myClouds = new clouds();
+    myClouds.build(scene);
+
 
     //添加辅助工具
-    let tool = new helpersTools();
-    // tool.gridHelperBuild(scene);
-    tool.axesHelperBuild(scene);
+    if(isUseTool){
+        let tool = new helpersTools();
+        tool.gridHelperBuild(scene);
+        tool.axesHelperBuild(scene);
 
-    //tool.directionalLightHelperBuild(scene,light.directionalLight);
-    tool.cameraHelperBuild(scene,light.directionalLight.shadow.camera);
+        tool.directionalLightHelperBuild(scene,light.directionalLight);
+        tool.cameraHelperBuild(scene,light.directionalLight.shadow.camera);
+    }
 
+    //标签绑定事件
+    let tagContainer = document.getElementById("container");
+    tagContainer.addEventListener('mousemove',function(e){
+        mousePreX = mouseCurX;
+        mousePreY = mouseCurY;
+        mouseCurX = e.pageX;
+        mouseCurY = e.pageY;
+    });
+
+    tagContainer.addEventListener('touchmove',function(e){
+        mousePreX = mouseCurX;
+        mousePreY = mouseCurY;
+        mouseCurX = event.targetTouches[0].pageX;
+        mouseCurY = event.targetTouches[0].pageY;
+    });
 
     let animate = function(){
         window.requestAnimationFrame(animate);
 
-        controls.build();
+        if(controls != null){
+            controls.build();
+        }
 
         myPlane.fly();
         myPlane.flyer.hairAnimate();
         myGround.move();
 
-        stats.update();
+        myClouds.move();
+
+        //飞机根据鼠标移动进行移动
+        planeMoveByMouse(mousePreX,mousePreY,mouseCurX,mouseCurY,myPlane);
+        mousePreX = mouseCurX;
+        mousePreY = mouseCurY;
+
+        if(stats != null){
+            stats.update();
+        }
 
         renderer.render(scene,camera);
     };
@@ -180,7 +232,7 @@ window.onload = function(){
             this.hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, 0.9);
 
             this.directionalLight = new THREE.DirectionalLight( 0xffffff, 1);
-            this.directionalLight.position.set(15, 30, 0 );
+            this.directionalLight.position.set(15, 40, 0 );
             this.directionalLight.target.position.set( 0, 0, 0 );
             this.directionalLight.castShadow = true;
 
@@ -200,6 +252,61 @@ window.onload = function(){
         }
     };
     obj.sceneLight = sceneLight;
+
+    obj.planeMoveByMouse = function(mousePreX,mousePreY,mouseCurX,mouseCurY,plane){
+        const MaxAngle = Math.PI / 4;//最大角度
+        const MinAngle = -1 * Math.PI / 4;//最小的角度
+        const ChangeAngle = 0.08;//角度变化率
+        const ChangeSpeed_X = 0.5;//X轴速度变化率
+        const ChangeSpeed_Y = 0.1;//Y轴速度变化率
+        const ChangeSpeed_Z = 0.1;//Z轴速度变化率
+        const Max_X = 20;
+        const Min_X = -9;
+        const Max_Y = 36;
+        const Min_Y = 28;
+        const Max_Z = 33;
+        const Min_Z = 25;
+
+        if(mousePreX - mouseCurX < 0 ){
+            //鼠标向右移动
+            if(plane.body.position.x < Max_X){
+                plane.body.position.x += ChangeSpeed_X;
+            }
+        }else if(mousePreX - mouseCurX > 0){
+            //鼠标向左移动
+            if(plane.body.position.x > Min_X){
+                plane.body.position.x -= ChangeSpeed_X;
+            }
+        }else{
+            //鼠标不移动
+        }
+
+        if(mousePreY - mouseCurY < 0 ){
+            //鼠标向下移动
+            if(plane.body.position.y > Min_Y){
+                plane.body.position.y -= ChangeSpeed_Y;
+            }
+            if(plane.body.position.z < Max_Z){
+                plane.body.position.z += ChangeSpeed_Z;
+            }
+            if(plane.body.rotation.x < MaxAngle){
+                plane.body.rotation.x += ChangeAngle;
+            }
+        }else if(mousePreY - mouseCurY > 0){
+            //鼠标向上移动
+            if(plane.body.position.y < Max_Y){
+                plane.body.position.y += ChangeSpeed_Y;
+            }
+            if(plane.body.position.z > Min_Z){
+                plane.body.position.z -= ChangeSpeed_Z;
+            }
+            if(plane.body.rotation.x > MinAngle){
+                plane.body.rotation.x -= ChangeAngle;
+            }
+        }else{
+            //鼠标不移动
+        }
+    };
 })(window);
 
 
