@@ -9,6 +9,15 @@ body,html{
     overflow: hidden;
 }
 #container{
+    position: relative;
     width: auto;
     height: auto;
+    z-index: 1;
+}
+#topcontainer{
+    position : absolute;
+    top : 0px;
+    width : 100%;
+    height: 100%;
+    z-index: 10;
 }

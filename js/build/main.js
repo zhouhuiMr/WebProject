@@ -95,6 +95,9 @@ window.onload = function(){
     let myClouds = new clouds();
     myClouds.build(scene);
 
+    let bird = new seaBird();
+    bird.body.position.set(0,33,29);
+    bird.build(scene);
 
     //添加辅助工具
     if(isUseTool){
@@ -107,7 +110,7 @@ window.onload = function(){
     }
 
     //标签绑定事件
-    let tagContainer = document.getElementById("container");
+    let tagContainer = document.getElementById("topcontainer");
     tagContainer.addEventListener('mousemove',function(e){
         mousePreX = mouseCurX;
         mousePreY = mouseCurY;
@@ -134,6 +137,7 @@ window.onload = function(){
         myGround.move();
 
         myClouds.move();
+        bird.move();
 
         //飞机根据鼠标移动进行移动
         planeMoveByMouse(mousePreX,mousePreY,mouseCurX,mouseCurY,myPlane);

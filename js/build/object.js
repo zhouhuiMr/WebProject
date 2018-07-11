@@ -470,6 +470,9 @@
     };
     window.pine = pine;
 
+    /**------------------------**/
+    /** 云彩                   **/
+    /**------------------------**/
     let cloud = function(x,y,z){
         this.body = new THREE.Group();
         this.x = x;
@@ -525,6 +528,9 @@
     };
     window.cloud = cloud;
 
+    /**------------------------**/
+    /** 多个云彩               **/
+    /**------------------------**/
     var clouds = function(){
         this.body  = new Array();
         this.cloudNum = 8;
@@ -554,6 +560,9 @@
     };
     window.clouds = clouds;
 
+    /**------------------------**/
+    /** 太阳                   **/
+    /**------------------------**/
     var sun = function(){
         this.body = new THREE.Group();
         this.sunMaterial = new THREE.MeshBasicMaterial({
@@ -575,4 +584,83 @@
         }
     };
     window.sun = sun;
+
+
+    /**------------------------**/
+    /** 海鸟                   **/
+    /**------------------------**/
+    let seaBird = function(){
+        this.body = new THREE.Group();
+        this.leftWing = null;
+        this.rightWing = null;
+        this.ISDOWN = true;
+        this.MoveSpeed = 0.2;
+        this.seaBirdMaterial = new THREE.MeshLambertMaterial({
+            color : 0xFFFFF0,
+            side : THREE.DoubleSide,
+            flatShading:true,
+            wireframe : false
+        });
+        this.init();
+    };
+    seaBird.prototype = {
+        init : function(){
+            let wingShape = new THREE.Shape();
+            wingShape.moveTo(0,0);
+            wingShape.lineTo(0.5,0);
+            wingShape.lineTo(0,2);
+            wingShape.lineTo(-0.5,0);
+            wingShape.lineTo(0,0);
+            let wingGeometry = new THREE.ShapeGeometry(wingShape,10);
+            this.leftWing = new THREE.Mesh(wingGeometry,this.seaBirdMaterial);
+            this.leftWing.castShadow = true;
+            this.rightWing = new THREE.Mesh(wingGeometry,this.seaBirdMaterial);
+            this.rightWing.castShadow = true;
+            this.body.add(this.leftWing);
+            this.body.add(this.rightWing);
+            let birdbodyGeometry = new THREE.BoxGeometry(1.2,0.02,0.02);
+            birdbodyGeometry.translate(0,0,0);
+            let birdBody = new THREE.Mesh(birdbodyGeometry,this.seaBirdMaterial);
+            birdBody.castShadow = true;
+            this.body.add(birdBody);
+            this.leftWing.rotateX(Math.PI / 6);
+            this.rightWing.rotateX(-1 * Math.PI / 6);
+        },
+        build : function(scene){
+            scene.add(this.body);
+        },
+        move :function(){
+            let LRX = Math.round(this.leftWing.rotation.x * 100) / 100;
+            const MAX_LRX = Math.round(5 * Math.PI / 6 * 100 ) / 100 ;
+            const MIN_LRX = Math.round( Math.PI / 6 * 100 ) / 100;
+            let RRX = Math.round(this.rightWing.rotation.x * 100) / 100;
+            const MAX_RRX = Math.round(-1 * 5 * Math.PI / 6 * 100 ) / 100 ;
+            const MIN_RRX = Math.round( -1 * Math.PI / 6 * 100 ) / 100;
+            if(LRX >= MAX_LRX){
+                this.ISDOWN = false;
+            }
+            if(LRX <= MIN_LRX){
+                this.ISDOWN = true;
+            }
+            if(this.ISDOWN){
+                this.leftWing.rotateX(this.MoveSpeed);
+                this.rightWing.rotateX(-1 * this.MoveSpeed);
+            }else{
+                this.leftWing.rotateX(-1 * this.MoveSpeed);
+                this.rightWing.rotateX(this.MoveSpeed);
+            }
+        }
+    };
+    window.seaBird = seaBird;
+
+    let seaBirds = function(){
+        this.body = new THREE.Group();
+        this.NUMBER = 20;
+    };
+    seaBirds.prototype = {
+        init : function(){
+
+        }
+    };
+    window.seaBirds = seaBirds;
 })(window);
