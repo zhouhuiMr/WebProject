@@ -95,9 +95,11 @@ window.onload = function(){
     let myClouds = new clouds();
     myClouds.build(scene);
 
-    let bird = new seaBird();
-    bird.body.position.set(0,33,29);
-    bird.build(scene);
+    let birds = new seaBirds(scene,myPlane);
+
+    let raycaster = new THREE.Raycaster();
+
+    let autopilot = new Autopilot(raycaster,myPlane,birds);
 
     //添加辅助工具
     if(isUseTool){
@@ -137,12 +139,14 @@ window.onload = function(){
         myGround.move();
 
         myClouds.move();
-        bird.move();
+        birds.move();
+
+        autopilot.collision();
 
         //飞机根据鼠标移动进行移动
-        planeMoveByMouse(mousePreX,mousePreY,mouseCurX,mouseCurY,myPlane);
-        mousePreX = mouseCurX;
-        mousePreY = mouseCurY;
+        // planeMoveByMouse(mousePreX,mousePreY,mouseCurX,mouseCurY,myPlane);
+        // mousePreX = mouseCurX;
+        // mousePreY = mouseCurY;
 
         if(stats != null){
             stats.update();
@@ -153,7 +157,9 @@ window.onload = function(){
     animate();
 };
 (function(obj){
-    // 辅助工具
+    /**------------------------**/
+    /** 辅助工具               **/
+    /**------------------------**/
     let helpersTools = function(){
         this.gridHelper = null;
         this.axesHelper = null;
@@ -187,7 +193,9 @@ window.onload = function(){
     };
     obj.helpersTools = helpersTools;
 
-    //视角控制
+    /**------------------------**/
+    /** 视角控制               **/
+    /**------------------------**/
     let cameraControls = function(camera,dom){
         this.camera = camera;
         this.doc = dom;
@@ -224,6 +232,9 @@ window.onload = function(){
     };
     obj.cameraControls = cameraControls;
 
+    /**------------------------**/
+    /** 场景中的光源           **/
+    /**------------------------**/
     let sceneLight = function(scene,camera){
         this.scene = scene;
         this.camera = camera;
@@ -257,6 +268,9 @@ window.onload = function(){
     };
     obj.sceneLight = sceneLight;
 
+    /**------------------------**/
+    /** 鼠标控制               **/
+    /**------------------------**/
     obj.planeMoveByMouse = function(mousePreX,mousePreY,mouseCurX,mouseCurY,plane){
         const MaxAngle = Math.PI / 4;//最大角度
         const MinAngle = -1 * Math.PI / 4;//最小的角度
@@ -311,6 +325,20 @@ window.onload = function(){
             //鼠标不移动
         }
     };
+    /**------------------------**/
+    /** 鼠标控制               **/
+    /**------------------------**/
+    let Autopilot = function(raycaster,plane,seabirds){
+        this.raycaster = raycaster;
+        this.plane = plane;
+        this.seabirds = seabirds;
+    };
+    Autopilot.prototype = {
+        collision : function(){
+
+        }
+    };
+    obj.Autopilot = Autopilot;
 })(window);
 
 

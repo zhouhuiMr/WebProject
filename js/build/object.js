@@ -3,7 +3,9 @@
  * @since 2018.06.09
  * @description 主要的应用对象
  * */
+
 (function(window){
+    'user strict'
     /**------------------------**/
     /**  飞机                  **/
     /**------------------------**/
@@ -322,7 +324,7 @@
             return this.body;
         },
         hairAnimate : function(){
-            for(var i=0;i<this.hairArray.length;i++){
+            for(let i=0;i<this.hairArray.length;i++){
                 let hair = this.hairArray[i];
                 let h = Math.random() * 0.3;
                 hair.position.y = h + 0.4;
@@ -594,7 +596,7 @@
         this.leftWing = null;
         this.rightWing = null;
         this.ISDOWN = true;
-        this.MoveSpeed = 0.2;
+        this.MoveSpeed = 0.1 + Math.random() * 0.2;
         this.seaBirdMaterial = new THREE.MeshLambertMaterial({
             color : 0xFFFFF0,
             side : THREE.DoubleSide,
@@ -625,6 +627,7 @@
             this.body.add(birdBody);
             this.leftWing.rotateX(Math.PI / 6);
             this.rightWing.rotateX(-1 * Math.PI / 6);
+            this.body.scale.set(0.8,0.8,0.8);
         },
         build : function(scene){
             scene.add(this.body);
@@ -653,13 +656,89 @@
     };
     window.seaBird = seaBird;
 
-    let seaBirds = function(){
-        this.body = new THREE.Group();
-        this.NUMBER = 20;
+    let seaBirds = function(scene,plane){
+        this.scene = scene;
+        this.body = new Array();
+        this.plane = plane;
+        this.preStartTime = new Date().getTime();
+        this.INTERVAL = (10 + Math.round(Math.random() * 2)) * 1000;
+        this.MIN_POSX = -40;
     };
     seaBirds.prototype = {
-        init : function(){
+        createBird :function(num){
+            switch (num){
+                case 0:
+                    //生成单个
+                    let bird = new seaBird();
+                    let y = this.plane.body.position.y;
+                    let z = this.plane.body.position.z;
+                    bird.body.position.set(Math.random() * 20 + 30,y,z);
+                    bird.build(this.scene);
+                    this.body.push(bird);
+                    break;
+                case 1:
+                    //生成多个
+                    let num = Math.ceil(Math.random() * 3) + 1;
+                    let x1 = Math.random() * 20 + 30;
+                    let y1 = this.plane.body.position.y;
+                    let z1 = this.plane.body.position.z;
+                    for(let i = 0;i < num;i ++){
+                        let bird = new seaBird();
+                        bird.body.position.set(x1 + 3 * i,y1,z1);
+                        bird.build(this.scene);
+                        this.body.push(bird);
+                    }
+                    break;
+                case 2:
+                    //
+                    let num2 = 6;
+                    let x2 = Math.random() * 20 + 30;
+                    let y2 = this.plane.body.position.y;
+                    let z2 = this.plane.body.position.z;
+                    for(let i = 0;i < num2;i ++){
+                        let bird = new seaBird();
+                        bird.body.position.set(x2 + 3 * i,y2 + Math.cos(Math.PI / 2 *i) * 2,z2);
+                        bird.build(this.scene);
+                        this.body.push(bird);
+                    }
+                    break;
+                case 3:
+                    let num3 = 5;
+                    let x3 = Math.random() * 20 + 30;
+                    let y3 = this.plane.body.position.y;
+                    let z3 = this.plane.body.position.z;
+                    let P = Math.pow(-1,Math.floor(Math.random() * 2));
+                    for(let i = 0;i < num3;i ++){
+                        let bird = new seaBird();
+                        bird.body.position.set(x3 + P * 3 * i,y3 + 2 *i - 5,z3);
+                        bird.build(this.scene);
+                        this.body.push(bird);
+                    }
+                    break;
 
+            }
+        },
+        move : function(){
+            //获取当前系统时间
+            let curTime = new Date().getTime();
+            let calculateTime = this.preStartTime + this.INTERVAL;
+            if(curTime >= calculateTime){
+                let num = Math.floor(Math.random() * 4);
+                this.createBird(num);
+                this.preStartTime = curTime;
+                this.INTERVAL = (10 + Math.round(Math.random() * 2)) * 1000;
+            }
+            for(let j = 0;j < this.body.length;j ++){
+                let bird = this.body[j];
+                bird.body.position.x -= 0.1;
+                bird.move();
+                let x = bird.body.position.x;
+                if(x < this.MIN_POSX){
+                    this.scene.remove(bird.body);
+                    this.body.splice(j,1);
+                    break;
+                }
+            }
         }
     };
     window.seaBirds = seaBirds;
