@@ -23,6 +23,13 @@ window.onload = function(){
     let mouseCurX = 0;
     let mouseCurY = 0;
 
+    //飞机的厨师坐标
+    let initPlanePostion = {
+        "x" : 5,
+        "y" : 32,
+        "z" : 29
+    };
+
     //设置场景
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xFFEC8B);
@@ -84,7 +91,7 @@ window.onload = function(){
 
 
     let myPlane = new plane();
-    myPlane.body.position.set(5,32,29);
+    myPlane.body.position.set(initPlanePostion.x,initPlanePostion.y,initPlanePostion.z);
     myPlane.build(scene);
 
     // var p = new pine();
@@ -272,58 +279,26 @@ window.onload = function(){
     /** 鼠标控制               **/
     /**------------------------**/
     obj.planeMoveByMouse = function(mousePreX,mousePreY,mouseCurX,mouseCurY,plane){
-        const MaxAngle = Math.PI / 4;//最大角度
-        const MinAngle = -1 * Math.PI / 4;//最小的角度
-        const ChangeAngle = 0.08;//角度变化率
-        const ChangeSpeed_X = 0.5;//X轴速度变化率
-        const ChangeSpeed_Y = 0.1;//Y轴速度变化率
-        const ChangeSpeed_Z = 0.1;//Z轴速度变化率
-        const Max_X = 20;
-        const Min_X = -9;
-        const Max_Y = 36;
-        const Min_Y = 28;
-        const Max_Z = 33;
-        const Min_Z = 25;
-
         if(mousePreX - mouseCurX < 0 ){
             //鼠标向右移动
-            if(plane.body.position.x < Max_X){
-                plane.body.position.x += ChangeSpeed_X;
-            }
+
         }else if(mousePreX - mouseCurX > 0){
             //鼠标向左移动
-            if(plane.body.position.x > Min_X){
-                plane.body.position.x -= ChangeSpeed_X;
-            }
+
         }else{
             //鼠标不移动
         }
 
         if(mousePreY - mouseCurY < 0 ){
             //鼠标向下移动
-            if(plane.body.position.y > Min_Y){
-                plane.body.position.y -= ChangeSpeed_Y;
-            }
-            if(plane.body.position.z < Max_Z){
-                plane.body.position.z += ChangeSpeed_Z;
-            }
-            if(plane.body.rotation.x < MaxAngle){
-                plane.body.rotation.x += ChangeAngle;
-            }
+
         }else if(mousePreY - mouseCurY > 0){
             //鼠标向上移动
-            if(plane.body.position.y < Max_Y){
-                plane.body.position.y += ChangeSpeed_Y;
-            }
-            if(plane.body.position.z > Min_Z){
-                plane.body.position.z -= ChangeSpeed_Z;
-            }
-            if(plane.body.rotation.x > MinAngle){
-                plane.body.rotation.x -= ChangeAngle;
-            }
+
         }else{
             //鼠标不移动
         }
+        plane.move();
     };
     /**------------------------**/
     /** 鼠标控制               **/
@@ -332,10 +307,87 @@ window.onload = function(){
         this.raycaster = raycaster;
         this.plane = plane;
         this.seabirds = seabirds;
+
     };
     Autopilot.prototype = {
         collision : function(){
+            let queue = this.seabirds.queueHead;
+            if(queue.length > 0){
+                let position = queue[0].bird.body.position;
+                if(position.x - this.plane.body.position.x < 15){
+                    let birdStatus = queue[0].status;
+                    //Y轴方向
+                    if(birdStatus.y == 0 ){
+                        let randomY = Math.floor(Math.random() * 2);
+                        if(randomY == 0){
+                            this.plane.statusY.direction = 1;
+                            this.plane.statusY.targetSite = 1;
+                        }else{
+                            this.plane.statusY.direction = -1;
+                            this.plane.statusY.targetSite = -1;
+                        }
+                    }else if(birdStatus.y > 0){
+                        this.plane.statusY.direction = -1;
+                        this.plane.statusY.targetSite = 0;
+                    }else{
+                        this.plane.statusY.direction = 1;
+                        this.plane.statusY.targetSite = 0;
+                    }
+                    //X轴方向
+                    let randomX = Math.floor(Math.random() * 2);
+                    if(randomX == 0){
+                        this.plane.statusX.direction = -1;
+                        this.plane.statusX.targetSite = -1;
+                    }else{
+                        this.plane.statusX.direction = 0;
+                        this.plane.statusX.targetSite = 0;
+                    }
+                    //Z轴移动
+                    if(queue.type == 2 || queue.type == 3){
+                        //这两个状态一定要移动
+                        if(birdStatus.z == 0){
+                            let randomZ = Math.floor(Math.random() * 2);
+                            if(randomZ == 0){
+                                this.plane.statusZ.direction = 1;
+                                this.plane.statusZ.targetSite = 1;
+                            }else{
+                                this.plane.statusZ.direction = -1;
+                                this.plane.statusZ.targetSite = -1;
+                            }
+                        }else if(birdStatus.z > 0){
+                            this.plane.statusZ.direction = -1;
+                            this.plane.statusZ.targetSite = 0;
+                        }else{
+                            this.plane.statusZ.direction = 1;
+                            this.plane.statusZ.targetSite = 0;
+                        }
+                    }else{
+                        let randomZ1 = Math.floor(Math.random() * 2);
+                        if(randomZ1 == 0){
+                            if(birdStatus.z == 0){
+                                let randomZ = Math.floor(Math.random() * 2);
+                                if(randomZ == 0){
+                                    this.plane.statusZ.direction = 1;
+                                    this.plane.statusZ.targetSite = 1;
+                                }else{
+                                    this.plane.statusZ.direction = -1;
+                                    this.plane.statusZ.targetSite = -1;
+                                }
+                            }else if(birdStatus.z > 0){
+                                this.plane.statusZ.direction = -1;
+                                this.plane.statusZ.targetSite = 0;
+                            }else{
+                                this.plane.statusZ.direction = 1;
+                                this.plane.statusZ.targetSite = 0;
+                            }
+                        }
+                    }
+                    queue.splice(0,1);
+                    return;
+                }
+            }
 
+            this.plane.move();
         }
     };
     obj.Autopilot = Autopilot;

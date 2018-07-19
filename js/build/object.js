@@ -61,6 +61,42 @@
             wireframe : false
         });
 
+        //移动时候的参数
+        this.MaxAngle = Math.PI / 4;//最大角度
+        this.CenterAngle = 0;//中间角度
+        this.MinAngle = -1 * Math.PI / 4;//最小的角度
+        this.ChangeAngle = 0.08;//角度变化率
+        this.ChangeSpeed_X = 0.2;//X轴速度变化率
+        this.ChangeSpeed_Y = 0.2;//Y轴速度变化率
+        this.ChangeSpeed_Z = 0.2;//Z轴速度变化率
+        this.Max_X = 11;
+        this.Center_X = 5;
+        this.Min_X = -1;
+        this.Max_Y = 38;
+        this.Center_Y = 32;
+        this.Min_Y = 26;
+        this.Max_Z = 35;
+        this.Center_Z = 29;
+        this.Min_Z = 23;
+
+        /**--------------------------------------------**/
+        /** direction >0 向正方向移动，<0 向负方向移动 **/
+        /** =0没有移动                                 **/
+        /** targetSite >0最近点，<0最远点 =0中间位置   **/
+        /**--------------------------------------------**/
+        this.statusX = {
+            direction : 0,
+            targetSite : 0
+        };
+        this.statusY = {
+            direction : 0,
+            targetSite : 0
+        };
+        this.statusZ = {
+            direction : 0,
+            targetSite : 0
+        };
+
         //this.airScrewRotation = 0;// 螺旋桨转过的角度
         this.init();
     };
@@ -217,6 +253,104 @@
         },
         fly : function(){
             this.airScrew.rotateX(Math.PI / 4);
+        },
+        checkstatus : function(){
+
+        },
+        move : function(){
+            this.checkstatus();
+            //在X轴的移动
+            let position = this.body.position; // 当前的位置
+            let rotation = this.body.rotation; // 转过的角度
+
+            if(this.statusX.direction > 0){
+                //向‘+’方向移动
+                if(this.statusX.targetSite == 0){
+                    //移动到中间位置
+                    if(position.x <= this.Center_X){
+                        position.x += this.ChangeSpeed_X;
+                    }
+                }else{
+                    //移动到最右边
+                    if(position.x <= this.Max_X){
+                        position.x += this.ChangeSpeed_X;
+                    }
+                }
+            }else if(this.statusX.direction < 0){
+                //向‘-’方向移动
+                if(this.statusX.targetSite == 0){
+                    //移动到中间位置
+                    if(position.x >= this.Center_X){
+                        position.x -= this.ChangeSpeed_X;
+                    }
+                }else{
+                    //移动到最左边
+                    if(position.x >= this.Min_X){
+                        position.x -= this.ChangeSpeed_X;
+                    }
+                }
+            }
+
+            //在Y轴的移动
+            if(this.statusY.direction > 0){
+                //向Y轴正方向移动(向上移动)
+                if(this.statusY.targetSite == 0){
+                    if(position.y <= this.Center_Y){
+                        position.y += this.ChangeSpeed_Y;
+                    }
+                }else{
+                    if(position.y <= this.Max_Y){
+                        position.y += this.ChangeSpeed_Y;
+                    }
+                }
+            }else if (this.statusY.direction < 0){
+                //向Y轴负方向移动（向下移动）
+                if(this.statusY.targetSite == 0){
+                    if(position.y >= this.Center_Y){
+                        position.y -= this.ChangeSpeed_Y;
+                    }
+                }else{
+                    if(position.y >= this.Min_Y){
+                        position.y -= this.ChangeSpeed_Y;
+                    }
+                }
+            }
+            //在Z轴进行移动
+            if(this.statusZ.direction > 0){
+                //向Z轴正方向移动（近处）
+                if(this.statusZ.targetSite == 0){
+                    if(position.z <= this.Center_Z){
+                        position.z += this.ChangeSpeed_Z;
+                    }
+                    if(rotation.x <= this.CenterAngle){
+                        this.body.rotation.x += this.ChangeAngle;
+                    }
+                }else{
+                    if(position.z <= this.Max_Z){
+                        position.z += this.ChangeSpeed_Z;
+                    }
+                    if(rotation.x <= this.MaxAngle){
+                        this.body.rotation.x += this.ChangeAngle;
+                    }
+                }
+            }else if(this.statusZ.direction < 0){
+                //向Z轴负方向移动（远处）
+                if(this.statusZ.targetSite == 0){
+                    if(position.z >= this.Center_Z){
+                        position.z -= this.ChangeSpeed_Z;
+                    }
+                    if(rotation.x >= this.CenterAngle){
+                        this.body.rotation.x -= this.ChangeAngle;
+                    }
+                }else{
+                    if(position.z >= this.Min_Z){
+                        position.z -= this.ChangeSpeed_Z;
+                    }
+                    if(rotation.x >= this.MinAngle){
+                        this.body.rotation.x -= this.ChangeAngle;
+                    }
+                }
+            }
         }
     };
     window.plane = plane;
@@ -659,60 +793,132 @@
     let seaBirds = function(scene,plane){
         this.scene = scene;
         this.body = new Array();
+        this.queueHead = new Array();//每次生成的海鸟的第一个
         this.plane = plane;
         this.preStartTime = new Date().getTime();
-        this.INTERVAL = (10 + Math.round(Math.random() * 2)) * 1000;
+        this.FIXEDINTERVAL = 8;
+        this.INTERVAL = (this.FIXEDINTERVAL + Math.round(Math.random() * 2)) * 1000;
         this.MIN_POSX = -40;
     };
     seaBirds.prototype = {
+
         createBird :function(num){
+            let status_x = 0;
+            let status_y = 0;
+            let status_z = 0;
+            let position = this.plane.body.position;
+            let y = position.y;
+            let z = position.z;
+            if(position.x - this.plane.Center_X >= 1){
+                status_x = 1;
+            }else if(position.x - this.plane.Center_X <= -1){
+                status_x = -1;
+            }else{
+                status_x = 0;
+            }
+            if(y - this.plane.Center_Y >= 1){
+                status_y = 1;
+            }else if(y - this.plane.Center_Y <= -1){
+                status_y = -1;
+            }else{
+                status_y = 0;
+            }
+            if(z - this.plane.Center_Z >= 1){
+                status_z = 1;
+            }else if(z - this.plane.Center_Z <= -1){
+                status_z = -1;
+            }else{
+                status_z = 0;
+            }
             switch (num){
                 case 0:
                     //生成单个
                     let bird = new seaBird();
-                    let y = this.plane.body.position.y;
-                    let z = this.plane.body.position.z;
                     bird.body.position.set(Math.random() * 20 + 30,y,z);
                     bird.build(this.scene);
                     this.body.push(bird);
+                    let object = {
+                        "bird" : bird,
+                        "number" : 1,
+                        "type" : 0,
+                        "status" : {
+                            x : status_x,
+                            y : status_y,
+                            z : status_z
+                        }
+                    };
+                    this.queueHead.push(object);
                     break;
                 case 1:
                     //生成多个
                     let num = Math.ceil(Math.random() * 3) + 1;
                     let x1 = Math.random() * 20 + 30;
-                    let y1 = this.plane.body.position.y;
-                    let z1 = this.plane.body.position.z;
                     for(let i = 0;i < num;i ++){
                         let bird = new seaBird();
-                        bird.body.position.set(x1 + 3 * i,y1,z1);
+                        bird.body.position.set(x1 + 3 * i,y,z);
                         bird.build(this.scene);
                         this.body.push(bird);
+                        if(i == 0){
+                            let object = {
+                                "bird" : bird,
+                                "number" : num,
+                                "type" : 1,
+                                "status" : {
+                                    x : status_x,
+                                    y : status_y,
+                                    z : status_z
+                                }
+                            };
+                            this.queueHead.push(object);
+                        }
                     }
                     break;
                 case 2:
                     //
                     let num2 = 6;
                     let x2 = Math.random() * 20 + 30;
-                    let y2 = this.plane.body.position.y;
-                    let z2 = this.plane.body.position.z;
                     for(let i = 0;i < num2;i ++){
                         let bird = new seaBird();
-                        bird.body.position.set(x2 + 3 * i,y2 + Math.cos(Math.PI / 2 *i) * 2,z2);
+                        bird.body.position.set(x2 + 3 * i,y + Math.sin(Math.PI / 2 *i) * 2,z);
                         bird.build(this.scene);
                         this.body.push(bird);
+                        if(i == 0){
+                            let object = {
+                                "bird" : bird,
+                                "number" : num2,
+                                "type" : 2,
+                                "status" : {
+                                    x : status_x,
+                                    y : status_y,
+                                    z : status_z
+                                }
+                            };
+                            this.queueHead.push(object);
+                        }
                     }
                     break;
                 case 3:
                     let num3 = 5;
                     let x3 = Math.random() * 20 + 30;
-                    let y3 = this.plane.body.position.y;
-                    let z3 = this.plane.body.position.z;
                     let P = Math.pow(-1,Math.floor(Math.random() * 2));
                     for(let i = 0;i < num3;i ++){
                         let bird = new seaBird();
-                        bird.body.position.set(x3 + P * 3 * i,y3 + 2 *i - 5,z3);
+                        bird.body.position.set(x3 + P * 3 * i,y + 2 *i - 5,z);
                         bird.build(this.scene);
                         this.body.push(bird);
+                        if(i == 2){
+                            let object = {
+                                "bird" : bird,
+                                "number" : num3,
+                                "type" : 3,
+                                "status" : {
+                                    x : status_x,
+                                    y : status_y,
+                                    z : status_z
+                                }
+                            };
+                            this.queueHead.push(object);
+                        }
                     }
                     break;
 
@@ -726,7 +932,7 @@
                 let num = Math.floor(Math.random() * 4);
                 this.createBird(num);
                 this.preStartTime = curTime;
-                this.INTERVAL = (10 + Math.round(Math.random() * 2)) * 1000;
+                this.INTERVAL = (this.FIXEDINTERVAL + Math.round(Math.random() * 2)) * 1000;
             }
             for(let j = 0;j < this.body.length;j ++){
                 let bird = this.body[j];
