@@ -67,14 +67,14 @@
         this.MinAngle = -1 * Math.PI / 4;//最小的角度
         this.ChangeAngle = 0.08;//角度变化率
         this.ChangeSpeed_X = 0.2;//X轴速度变化率
-        this.ChangeSpeed_Y = 0.2;//Y轴速度变化率
+        this.ChangeSpeed_Y = 0.1;//Y轴速度变化率
         this.ChangeSpeed_Z = 0.2;//Z轴速度变化率
         this.Max_X = 11;
         this.Center_X = 5;
         this.Min_X = -1;
-        this.Max_Y = 38;
+        this.Max_Y = 35;
         this.Center_Y = 32;
-        this.Min_Y = 26;
+        this.Min_Y = 29;
         this.Max_Z = 35;
         this.Center_Z = 29;
         this.Min_Z = 23;
