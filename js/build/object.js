@@ -77,7 +77,7 @@
         this.Min_Y = 29;
         this.Max_Z = 35;
         this.Center_Z = 29;
-        this.Min_Z = 23;
+        this.Min_Z = 27;
 
         /**--------------------------------------------**/
         /** direction >0 向正方向移动，<0 向负方向移动 **/
@@ -790,46 +790,19 @@
     };
     window.seaBird = seaBird;
 
-    let seaBirds = function(scene,plane){
+    let seaBirds = function(scene){
         this.scene = scene;
         this.body = new Array();
-        this.queueHead = new Array();//每次生成的海鸟的第一个
-        this.plane = plane;
+        this.position = null;// x,y,z
         this.preStartTime = new Date().getTime();
-        this.FIXEDINTERVAL = 8;
+        this.FIXEDINTERVAL = 7;
         this.INTERVAL = (this.FIXEDINTERVAL + Math.round(Math.random() * 2)) * 1000;
         this.MIN_POSX = -40;
     };
     seaBirds.prototype = {
-
         createBird :function(num){
-            let status_x = 0;
-            let status_y = 0;
-            let status_z = 0;
-            let position = this.plane.body.position;
-            let y = position.y;
-            let z = position.z;
-            if(position.x - this.plane.Center_X >= 1){
-                status_x = 1;
-            }else if(position.x - this.plane.Center_X <= -1){
-                status_x = -1;
-            }else{
-                status_x = 0;
-            }
-            if(y - this.plane.Center_Y >= 1){
-                status_y = 1;
-            }else if(y - this.plane.Center_Y <= -1){
-                status_y = -1;
-            }else{
-                status_y = 0;
-            }
-            if(z - this.plane.Center_Z >= 1){
-                status_z = 1;
-            }else if(z - this.plane.Center_Z <= -1){
-                status_z = -1;
-            }else{
-                status_z = 0;
-            }
+            let y = this.position.y;
+            let z = this.position.z;
             switch (num){
                 case 0:
                     //生成单个
@@ -837,17 +810,6 @@
                     bird.body.position.set(Math.random() * 20 + 30,y,z);
                     bird.build(this.scene);
                     this.body.push(bird);
-                    let object = {
-                        "bird" : bird,
-                        "number" : 1,
-                        "type" : 0,
-                        "status" : {
-                            x : status_x,
-                            y : status_y,
-                            z : status_z
-                        }
-                    };
-                    this.queueHead.push(object);
                     break;
                 case 1:
                     //生成多个
@@ -858,19 +820,6 @@
                         bird.body.position.set(x1 + 3 * i,y,z);
                         bird.build(this.scene);
                         this.body.push(bird);
-                        if(i == 0){
-                            let object = {
-                                "bird" : bird,
-                                "number" : num,
-                                "type" : 1,
-                                "status" : {
-                                    x : status_x,
-                                    y : status_y,
-                                    z : status_z
-                                }
-                            };
-                            this.queueHead.push(object);
-                        }
                     }
                     break;
                 case 2:
@@ -882,19 +831,6 @@
                         bird.body.position.set(x2 + 3 * i,y + Math.sin(Math.PI / 2 *i) * 2,z);
                         bird.build(this.scene);
                         this.body.push(bird);
-                        if(i == 0){
-                            let object = {
-                                "bird" : bird,
-                                "number" : num2,
-                                "type" : 2,
-                                "status" : {
-                                    x : status_x,
-                                    y : status_y,
-                                    z : status_z
-                                }
-                            };
-                            this.queueHead.push(object);
-                        }
                     }
                     break;
                 case 3:
@@ -906,19 +842,6 @@
                         bird.body.position.set(x3 + P * 3 * i,y + 2 *i - 5,z);
                         bird.build(this.scene);
                         this.body.push(bird);
-                        if(i == 2){
-                            let object = {
-                                "bird" : bird,
-                                "number" : num3,
-                                "type" : 3,
-                                "status" : {
-                                    x : status_x,
-                                    y : status_y,
-                                    z : status_z
-                                }
-                            };
-                            this.queueHead.push(object);
-                        }
                     }
                     break;
 
@@ -926,6 +849,11 @@
         },
         move : function(){
             //获取当前系统时间
+            this.position = {
+                x : 0,
+                y : Math.random() * 7 + 26,
+                z : 25
+            };
             let curTime = new Date().getTime();
             let calculateTime = this.preStartTime + this.INTERVAL;
             if(curTime >= calculateTime){

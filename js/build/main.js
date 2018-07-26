@@ -264,8 +264,8 @@ window.onload = function(){
             this.directionalLight.shadow.camera.top = 60;
             this.directionalLight.shadow.camera.near = 0.1;
             this.directionalLight.shadow.camera.far = 60;
-            this.directionalLight.shadow.mapSize.width = 2048;  // default
-            this.directionalLight.shadow.mapSize.height = 2048; // default
+            this.directionalLight.shadow.mapSize.width = 1024;  // default
+            this.directionalLight.shadow.mapSize.height = 1024; // default
 
         },
         build : function(){
@@ -309,10 +309,60 @@ window.onload = function(){
         this.seabirds = seabirds;
         this.currentTime = new Date().getTime();
         this.previuseTime = new Date().getTime();
+        this.intervalTime = (Math.random() * 5 + 5) * 1000;
         this.animationContainer = new Array();
+        this.init();
     };
     Autopilot.prototype = {
         init : function(){
+            // 初始化动画
+            let ani_1 = {
+                x : {
+                    direction : 0,
+                    targetSite : 0
+                },
+                y : {
+                    direction : 0,
+                    targetSite : 0
+                },
+                z : {
+                    direction : 1,
+                    targetSite : 1
+                }
+            };
+            this.animationContainer.push(ani_1);
+
+            let ani_2 = {
+                x : {
+                    direction : 0,
+                    targetSite : 0
+                },
+                y : {
+                    direction : -1,
+                    targetSite : -1
+                },
+                z : {
+                    direction : -1,
+                    targetSite : -1
+                }
+            };
+            this.animationContainer.push(ani_2);
+
+            let ani_3 = {
+                x : {
+                    direction : 0,
+                    targetSite : 0
+                },
+                y : {
+                    direction : 0,
+                    targetSite : 0
+                },
+                z : {
+                    direction : 0,
+                    targetSite : 0
+                }
+            };
+            this.animationContainer.push(ani_3);
 
         },
         collision : function(){
@@ -320,17 +370,14 @@ window.onload = function(){
         },
         planMove : function(){
             this.currentTime = new Date().getTime();
-            let intervalTime = Math.random() * 5 +5;
-            if(this.previuseTime + intervalTime <= this.currentTime){
-                this.plane.statusY = {
-                    direction : -1,
-                    targetSite : -1
-                };
-                this.plane.statusZ = {
-                    direction : -1,
-                    targetSite : -1
-                };
-                this.previuseTime = new Date().getTime();
+            if(this.previuseTime + this.intervalTime <= this.currentTime){
+                let randomNum = Math.floor(Math.random() * (this.animationContainer.length));
+                let ani = this.animationContainer[randomNum];
+                this.plane.statusX = ani.x;
+                this.plane.statusY = ani.y;
+                this.plane.statusZ = ani.z;
+                this.previuseTime = this.currentTime;
+                this.intervalTime = (Math.random() * 5 +5) * 1000;
             }
             this.plane.move();
         }
