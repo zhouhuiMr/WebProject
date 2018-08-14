@@ -23,7 +23,7 @@ window.onload = function(){
     let mouseCurX = 0;
     let mouseCurY = 0;
 
-    //飞机的厨师坐标
+    //飞机的初始坐标
     let initPlanePostion = {
         "x" : 5,
         "y" : 32,
@@ -162,6 +162,9 @@ window.onload = function(){
         renderer.render(scene,camera);
     };
     animate();
+
+    //页面效果
+    new html_animation();
 };
 (function(obj){
     /**------------------------**/
