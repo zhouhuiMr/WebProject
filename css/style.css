@@ -1,7 +1,7 @@
 *{
-    margin: 0px 0px 0px 0px;
-    border: 0px;
-    padding: 0px 0px 0px 0px;
+    margin: 0 0 0 0;
+    border: 0;
+    padding: 0 0 0 0;
 }
 body,html{
     width: 100%;
@@ -16,7 +16,7 @@ body,html{
 }
 #topcontainer{
     position : absolute;
-    top : 0px;
+    top : 0;
     width : 100%;
     height: 100%;
     z-index: 10;
@@ -25,8 +25,8 @@ body,html{
 /**--      top     --**/
 #topcontainer{
     position: absolute;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 140px;
     z-index: 10;
@@ -46,15 +46,15 @@ body,html{
     position: relative;
     width: 100%;
     height: 100%;
-    margin-left: 0%;
-    margin-top: 0%;
+    margin-left: 0;
+    margin-top: 0;
 }
 
 #topcontainer > .menu_border{
     position: absolute;
     width : 100%;
     height :100%;
-    top: 0px;
+    top: 0;
     z-index: 10;
 }
 .menu_border > .border_center{
@@ -66,11 +66,158 @@ body,html{
 }
 .menu_border > .border_center > img{
     position: relative;
-    width: 0%;
-    height: 0%;
+    width: 0;
+    height: 0;
     left: 50%;
     top: 50%;
     vertical-align: middle;
+}
+#topcontainer > .menu_text_container{
+    position: absolute;
+    width : 100%;
+    height :100%;
+    top: 0;
+    z-index: 20;
+    background: none;
+}
+#topcontainer > .menu_text_container  img{
+    position: relative;
+    width: auto;
+    height: 100px;
+    margin-top: 20px;
+}
+
+#topcontainer > .menu_text_container  .left_arrow{
+    float: left;
+}
+
+#topcontainer > .menu_text_container  .right_arrow{
+    float: right;
+}
+
+#topcontainer > .menu_text_container > .menu_text{
+    position: relative;
+    width: 340px;
+    height: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    display: none;
+    overflow: hidden;
+}
+
+.menu_text > .menu_list{
+    position: absolute;
+    width: 1190px;
+    height: 100%;
+    top: 0;
+}
+.menu_text > .menu_list > .menu_list_span{
+    position: relative;
+    width:300px;
+    height: 100%;
+    margin-left: 20px;
+}
+.menu_text > .menu_list > .left_menu{
+    float: left;
+}
+.menu_text > .menu_list > .right_menu{
+    float: right;
+}
+
+.menu_list_span > ul{
+    position: relative;
+    width: 100%;
+    height: 100%;
+    list-style: none;
+}
+.menu_list_span > ul > li{
+    float: left;
+    width: 50%;
+    height: 100%;
+    text-align: center;
+    font-family: Microsoft YaHei,Heiti SC,tahoma,arial,Hiragino Sans GB,\\5B8B\4F53,sans-serif;
+    font-size: 2.4em;
+    color: #FFFFFF;
+    font-weight: 900;
+}
+.menu_list_span > ul > li > a{
+    display: block;
+    position: relative;
+    width: 60%;
+    height: 100px;
+    margin-left: 20%;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-decoration: none;
+    color: #00536D;
+    line-height: 100px;
+    overflow: hidden;
+}
+.menu_list_span > ul > li > a:hover{
+    -webkit-transition: none;
+    transition: none;
+    color: transparent;
+}
+.menu_list_span > ul > li > a:before{
+    content: '';
+    width: 100%;
+    height: 4px;
+    margin: -2px 0 0 0;
+    background: #FFFFFF;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    -webkit-transform: translate3d(-100%,0,0);
+    transform: translate3d(-100%,0,0);
+    -webkit-transition: -webkit-transform 0.4s;
+    transition: transform 0.4s;
+    -webkit-transition-timing-function: cubic-bezier(0.7,0,0.3,1);
+    transition-timing-function: cubic-bezier(0.7,0,0.3,1);
+}
+.menu_list_span > ul > li > a:hover:before{
+    -webkit-transform: translate3d(100%,0,0);
+    transform: translate3d(100%,0,0);
+}
+.menu_list_span .text_half{
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 50%;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+.menu_list_span .text_bottom{
+    top: 50%;
+}
+.menu_list_span .text_half:before{
+    content: attr(data-letters);
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 200%;
+    color: #FFFFFF;
+    -webkit-transition: -webkit-transform 0.5s;
+    transition: transform 0.5s;
+}
+.text_top:before{
+    top: 0;
+    transform: translate3d(0,100%,0);
+    -webkit-transform: translate3d(0,100%,0);
+}
+.text_bottom:before{
+    bottom: 0;
+    transform: translate3d(0,-100%,0);
+    -webkit-transform: translate3d(0,-100%,0);
+}
+
+.menu_list_span > ul > li > a:hover .text_half:before{
+    -webkit-transition-delay: 0.3s;
+    transition-delay: 0.3s;
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+    -webkit-transition-timing-function: cubic-bezier(0.2,1,0.3,1);
+    transition-timing-function: cubic-bezier(0.2,1,0.3,1);
 }
 
 /**--   loading container     --**/
@@ -78,8 +225,15 @@ body,html{
     position : absolute;
     width: 100%;
     height: 100%;
-    top: 0px;
-    left: 0px;
+    top: 0;
+    left: 0;
     background: #FFFFFF;
     z-index: 100;
+}
+
+/**--  width less than 1200px     --**/
+@media only screen and (max-width: 1200px) {
+    #topcontainer > .menu_text_container{
+        display: none;
+    }
 }
