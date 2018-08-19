@@ -83,8 +83,8 @@ body,html{
 #topcontainer > .menu_text_container  img{
     position: relative;
     width: auto;
-    height: 100px;
-    margin-top: 20px;
+    height: 40px;
+    margin-top: 50px;
 }
 
 #topcontainer > .menu_text_container  .left_arrow{
@@ -136,7 +136,7 @@ body,html{
     height: 100%;
     text-align: center;
     font-family: Microsoft YaHei,Heiti SC,tahoma,arial,Hiragino Sans GB,\\5B8B\4F53,sans-serif;
-    font-size: 2.4em;
+    font-size: 1.5em;
     color: #FFFFFF;
     font-weight: 900;
 }
@@ -149,21 +149,24 @@ body,html{
     margin-top: 20px;
     margin-bottom: 20px;
     text-decoration: none;
-    color: #00536D;
+    color: #4682B4;
     line-height: 100px;
+    text-shadow: 0px 0px 2px #1E90FF,-2px 2px 0 #0000CD;
     overflow: hidden;
 }
 .menu_list_span > ul > li > a:hover{
     -webkit-transition: none;
     transition: none;
     color: transparent;
+    text-shadow : none;
 }
 .menu_list_span > ul > li > a:before{
     content: '';
     width: 100%;
     height: 4px;
     margin: -2px 0 0 0;
-    background: #FFFFFF;
+    background: #ADD8E6;
+    box-shadow: -1px 1px 0px #4682B4;
     position: absolute;
     left: 0;
     top: 50%;
@@ -196,7 +199,8 @@ body,html{
     position: absolute;
     width: 100%;
     height: 200%;
-    color: #FFFFFF;
+    color: #ADD8E6;
+    text-shadow: 0px 0px 2px #FFFFFF,-2px 2px 0 #4682B4;
     -webkit-transition: -webkit-transform 0.5s;
     transition: transform 0.5s;
 }
