@@ -15,9 +15,37 @@
        "width" : (( containerWidth - Logo_Width ) / 2 - 40) +"px"
     });
 
+
+    let menu_open_event = function(){
+        $("#container").bind("click",function(){
+            $("#topcontainer").unbind("click");
+            $("#container").unbind("click");
+            $(".bt_menulist").show();
+            $("#right_menu_span").animate({"right":"-200px"},300,function(){
+                $("#right_menu_span").hide();
+            });
+        });
+        $("#topcontainer").bind("click",function(){
+            $("#topcontainer").unbind("click");
+            $("#container").unbind("click");
+            $(".bt_menulist").show();
+            $("#right_menu_span").animate({"right":"-200px"},300,function(){
+                $("#right_menu_span").hide();
+            });
+        });
+    };
+
     /**--------------**/
     /**-- 事件班定 --**/
     /**--------------**/
+
+    $(".bt_menulist").bind('click',function(){
+        $("#right_menu_span").show();
+        $(".bt_menulist").hide();
+        $("#right_menu_span").animate({"right":"0px"},300,function(){
+            menu_open_event();
+        });
+    });
 
     let html_animation = function(){
         $("#loadingcontainer").css({"display":"none"});

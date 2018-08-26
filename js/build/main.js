@@ -30,6 +30,14 @@ window.onload = function(){
         "z" : 29
     };
 
+    if(sceneWidth < 900){
+        initPlanePostion = {
+            "x" : 6,
+            "y" : 32,
+            "z" : 29
+        };
+    }
+
     //设置场景
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xFFEC8B);
@@ -314,6 +322,7 @@ window.onload = function(){
         this.previuseTime = new Date().getTime();
         this.intervalTime = (Math.random() * 5 + 5) * 1000;
         this.animationContainer = new Array();
+        this.pre_ani = null;
         this.init();
     };
     Autopilot.prototype = {
@@ -367,6 +376,39 @@ window.onload = function(){
             };
             this.animationContainer.push(ani_3);
 
+            let ani_4 = {
+                x : {
+                    direction : 0,
+                    targetSite : 0
+                },
+                y : {
+                    direction : 0,
+                    targetSite : 0
+                },
+                z : {
+                    direction : -1,
+                    targetSite : 0
+                }
+            };
+            this.animationContainer.push(ani_4);
+
+            let ani_5 = {
+                x : {
+                    direction : 0,
+                    targetSite : 0
+                },
+                y : {
+                    direction : 1,
+                    targetSite : 0
+                },
+                z : {
+                    direction : 1,
+                    targetSite : 0
+                }
+            };
+            this.animationContainer.push(ani_5);
+
+            this.pre_ani = ani_3;
         },
         collision : function(){
 
@@ -374,13 +416,22 @@ window.onload = function(){
         planMove : function(){
             this.currentTime = new Date().getTime();
             if(this.previuseTime + this.intervalTime <= this.currentTime){
-                let randomNum = Math.floor(Math.random() * (this.animationContainer.length));
+                let randomNum = Math.floor(Math.random() * 3);
                 let ani = this.animationContainer[randomNum];
+                if(randomNum == 2){
+                    if(this.pre_ani == this.animationContainer[0]){
+                        ani = this.animationContainer[3];
+                    }else if(this.pre_ani == this.animationContainer[1]){
+                        ani = this.animationContainer[4];
+                    }
+                }
                 this.plane.statusX = ani.x;
                 this.plane.statusY = ani.y;
                 this.plane.statusZ = ani.z;
                 this.previuseTime = this.currentTime;
                 this.intervalTime = (Math.random() * 5 +5) * 1000;
+
+                this.pre_ani = ani;
             }
             this.plane.move();
         }
