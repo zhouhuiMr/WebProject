@@ -10,9 +10,9 @@ window.onload = function(){
     let camera = null;
     let renderer = null;
     let isUseShadow = true;//是否开启阴影
-    let isUseTool = false; //是否显示辅助工具
-    let isShowFPS = false;//是否显示帧数
-    let isUseController = false;//是否使用视角控制
+    let isUseTool = true; //是否显示辅助工具
+    let isShowFPS = true;//是否显示帧数
+    let isUseController = true;//是否使用视角控制
     // 获取高度和宽度
     let sceneWidth = document.documentElement.clientWidth;
     let sceneHeight = document.documentElement.clientHeight;
@@ -41,11 +41,11 @@ window.onload = function(){
     //设置场景
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xFFEC8B);
-    scene.fog = new THREE.Fog(0xFFF68F,5,40);
+    //scene.fog = new THREE.Fog(0xFFF68F,5,40);
 
     //设置摄像机
     camera = new THREE.PerspectiveCamera( 75, sceneWidth/sceneHeight, 1, 300 );
-    camera.position.set(8,30,45);
+    //camera.position.set(8,30,45);
 
     //设置渲染方式
     renderer = new THREE.WebGLRenderer({alpha: true, antialias: true } );
@@ -94,12 +94,12 @@ window.onload = function(){
     mysun.build(scene);
 
     let myGround = new ground();
-    myGround.body.position.set(0,-40,30);
+    //myGround.body.position.set(0,-40,30);
     myGround.build(scene);
 
 
     let myPlane = new plane();
-    myPlane.body.position.set(initPlanePostion.x,initPlanePostion.y,initPlanePostion.z);
+   //myPlane.body.position.set(initPlanePostion.x,initPlanePostion.y,initPlanePostion.z);
     myPlane.build(scene);
 
     // var p = new pine();
@@ -156,7 +156,7 @@ window.onload = function(){
         myClouds.move();
         birds.move();
 
-        autopilot.planMove();
+        //autopilot.planMove();
 
         //飞机根据鼠标移动进行移动
         // planeMoveByMouse(mousePreX,mousePreY,mouseCurX,mouseCurY,myPlane);
@@ -262,7 +262,7 @@ window.onload = function(){
     };
     sceneLight.prototype = {
         init : function(){
-            this.hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, 0.9);
+            this.hemisphereLight = new THREE.HemisphereLight(0xaaaaaa,0xffffff, 0.5);
 
             this.directionalLight = new THREE.DirectionalLight( 0xffffff, 1);
             this.directionalLight.position.set(15, 40, 0 );
