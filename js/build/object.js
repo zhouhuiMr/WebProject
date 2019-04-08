@@ -14,8 +14,8 @@
 
         //飞机前半部分
         this.frontBody_X = 1;//大小
-        this.frontBody_Y = 2;
-        this.frontBody_Z = 2;
+        this.frontBody_Y = 1.5;
+        this.frontBody_Z = 1.5;
         this.frontBody_X_Segments = 1;//分段数
         this.frontBody_Y_Segments = 1;
         this.frontBody_Z_Segments = 1;
@@ -30,8 +30,8 @@
 
         //飞机的后半部分
         this.backBody_X = 3;
-        this.backBody_Y = 2;
-        this.backBody_Z = 2;
+        this.backBody_Y = 1.5;
+        this.backBody_Z = 1.5;
         this.backBody_X_Segments = 1;
         this.backBody_Y_Segments = 1;
         this.backBody_Z_Segments = 1;
